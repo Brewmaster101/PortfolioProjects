@@ -1,12 +1,12 @@
 
---Cleaning data in Nashville housing data
+--Cleaning data in Nashville housing dataset
 
 SELECT *
 FROM dbo.nhp;
 
 
 
---Standardized date format
+--Standardized date format. The sale date column had useless information that would not help in gathering insights
 
 SELECT saledate1 , CONVERT(Date , SaleDate)
 FROM dbo.nhp
@@ -21,13 +21,13 @@ UPDATE dbo.nhp
 SET saledate1 = CONVERT(Date , SaleDate);
 
 
---Removing a duplicate column
+--Removing a duplicate column 'SaleDate'. I created new columns that converted the data to be more useful for analysis. 
 
 ALTER TABLE dbo.nhp
 DROP COLUMN SaleDate;
 
 
---Property address data
+--Property address data. Here is where i joined the same table together so the proeprty addresses for duplicate values would be the same and not be a NULL value.
 
 SELECT *
 FROM dbo.nhp
@@ -49,7 +49,8 @@ ON a.ParcelID = b.ParcelID
 	AND a.UniqueID <> b.UniqueID
 WHERE a.PropertyAddress IS NULL;
 
---Seperating address into individual columns (address , city , state) using the substring code
+--Seperating address into individual columns (address , city , state) using the substring code. This allows the data to be more useful in gathering insights rather than having all that information in one column.
+--Substring can be more time consuming but I wanted to practice different ways of writing code and getting the same results.
 
 
 SELECT PropertyAddress
@@ -59,7 +60,7 @@ SELECT SUBSTRING(PropertyAddress , 1 , CHARINDEX(',' , PropertyAddress) -1) AS s
  , SUBSTRING(PropertyAddress , CHARINDEX(',' , PropertyAddress) + 1 , LEN(PropertyAddress)) AS city
 FROM dbo.nhp
 
---Now I have to add these new columns into the data set and update
+--Now I have to add these new columns into the dataset and update
 
 ALTER TABLE dbo.nhp
 ADD street_address NVARCHAR(255); 
@@ -73,7 +74,8 @@ ADD city NVARCHAR(255);
 UPDATE dbo.nhp
 SET city = SUBSTRING(PropertyAddress , CHARINDEX(',' , PropertyAddress) + 1 , LEN(PropertyAddress))
 
---I will check to make sure changes have been made and then remove 'PropertyAddress column from dataset
+--I will check to make sure changes have been made and then remove 'PropertyAddress' column from dataset
+-- Having multiple columns with the same data will take up space in the query and cause confusion later on.
 
 SELECT *
 FROM dbo.nhp;
@@ -81,7 +83,7 @@ FROM dbo.nhp;
 ALTER TABLE dbo.nhp
 DROP COLUMN PropertyAddress;
 
---Seperating OwnerAddress data using PARSENAME (it will look for '.' not ',')
+--Seperating OwnerAddress data using PARSENAME (it will look for '.' not ','). Additionally it starts from the end of the code, so for this example specifically I had to start with 3 instead of 1
 
 SELECT
 	PARSENAME(REPLACE(OwnerAddress , ',' , '.') , 3)
@@ -113,7 +115,7 @@ SET ownerstate_address = PARSENAME(REPLACE(OwnerAddress , ',' , '.') , 1);
 ALTER TABLE dbo.nhp
 DROP COLUMN OwnerAddress;
 
---In the 'SoldAsVacant column I want to make sure all rows are defined as 'Yes' or 'No'
+--In the 'SoldAsVacant' column I want to make sure all rows are defined as 'Yes' or 'No'. I will use a CASE to resove this issue.
 
 SELECT DISTINCT(SoldAsVacant) , COUNT(SoldAsVacant)
 FROM dbo.nhp
