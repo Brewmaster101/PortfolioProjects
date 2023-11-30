@@ -1,0 +1,109 @@
+--Problem Statement
+	1. KPI requirement-analyzing key indicators for pizza sales data to gain insights into our business performance 
+	2. Calculate the metrics
+		a. Total rev
+		b. Avg order value
+		c. Total pizza sold
+		d. Total orders
+		e. Avg pizzas per order
+	3. CHARTS REQUIREMENTS
+		a. Daily trend for total orders
+		b. Monthly trend for total orders
+		c. Percentage of sales by Pizza category
+		d. Percentage of sales pizza by size
+		e. Total pizza sold by pizza cat
+		f. Top 5 best sellers by rev, total quality, total orders
+		g. Bottom 5 best sellers by rev, total quality, total orders
+
+
+--Total revenue 
+
+SELECT SUM(total_price) AS total_revenue
+FROM pizza_sales; 
+
+
+--Average order value
+
+SELECT SUM(total_price) / COUNT (DISTINCT order_id) AS avg_order_value
+FROM pizza_sales
+
+
+--Total quantity
+
+SELECT SUM(quantity) AS total_quantity
+FROM pizza_sales
+
+
+--Total orders
+
+SELECT COUNT (DISTINCT order_id) AS total_orders
+FROM pizza_sales
+
+
+--Avg pizzas per order
+
+SELECT CAST(SUM(quantity) AS DECIMAL(10, 2)) / CAST(COUNT(DISTINCT order_id) AS DECIMAL(10,2)) AS avg_pizza_per_order
+FROM pizza_sales
+
+
+--Daily trend for total orders
+
+SELECT DATENAME(DW , order_date) AS order_day, COUNT(DISTINCT order_id) AS total_orders
+FROM pizza_sales
+GROUP BY DATENAME (DW ,order_date)
+
+
+--Monthly orders 
+
+SELECT DATENAME(MONTH , order_date) AS month_name , COUNT (DISTINCT order_id) AS total_orders
+FROM pizza_sales
+GROUP BY DATENAME(MONTH , order_date)
+ORDER BY total_orders DESC; 
+
+
+SELECT pizza_category,  SUM(total_price) *100 /
+	(SELECT sum(total_price) FROM pizza_sales) AS PCT
+FROM pizza_sales
+GROUP BY pizza_category 
+
+
+SELECT pizza_size,  CAST(SUM(total_price) *100 /
+	(SELECT sum(total_price) FROM pizza_sales) AS DECIMAL(10,2)) AS PCT
+FROM pizza_sales
+GROUP BY pizza_size
+
+SELECT TOP 5 pizza_name ,  SUM(order_id) AS total_revenue 
+FROM pizza_sales 
+GROUP BY pizza_name
+ORDER BY total_revenue DESC; 
+
+
+SELECT TOP 5 pizza_name ,  SUM(order_id) AS total_revenue 
+FROM pizza_sales 
+GROUP BY pizza_name
+ORDER BY total_revenue ASC; 
+
+
+SELECT TOP 5 pizza_name ,  SUM(quantity) AS total_quantity
+FROM pizza_sales 
+GROUP BY pizza_name
+ORDER BY total_quantity DESC; 
+
+
+SELECT TOP 5 pizza_name ,  SUM(quantity) AS total_quantity
+FROM pizza_sales 
+GROUP BY pizza_name
+ORDER BY total_quantity ASC; 
+
+SELECT TOP 5 pizza_name ,  COUNT(DISTINCT order_id) AS total_orders
+FROM pizza_sales 
+GROUP BY pizza_name
+ORDER BY total_orders DESC; 
+
+
+SELECT TOP 5 pizza_name ,  COUNT(DISTINCT order_id) AS total_orders
+FROM pizza_sales 
+GROUP BY pizza_name
+ORDER BY total_orders ASC; 
+
+
