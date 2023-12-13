@@ -1,7 +1,6 @@
 SELECT *
 FROM dbo.covid_deaths
-WHERE continent IS NOT NULL
-ORDER BY 3 , 4;
+WHERE continent IS NOT NULL;
 
 
 --Select the data that I want to use
@@ -9,6 +8,11 @@ ORDER BY 3 , 4;
 SELECT location , date , total_cases , new_cases , total_deaths , population 
 FROM dbo.covid_deaths
 ORDER BY 1 , 2; 
+
+--Fixing the date column
+
+UPDATE covid_deaths
+SET date = FORMAT(date, 'yyyy-MM-dd');
 
 --Looking at total cases vs total deaths 
 --Shows the likelyhood of dying when contracting Covid-19
